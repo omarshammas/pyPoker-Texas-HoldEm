@@ -44,47 +44,49 @@ class deck:
     
     #Initializes the deck, and adds jokers if specified
     def __init__(self, addJokers = False):
-        self.deck = []
+        self.cards = []
         self.inplay = []
         self.addJokers = addJokers
         for symbol in range(0,4):
             for value in range (2,15):
-                self.deck.append( Card(symbol, value) )
+                self.cards.append( Card(symbol, value) )
         if addJokers:
             self.total_cards = 54
-            self.deck.append( Card(-1, -1) )
-            self.deck.append( Card(-1, -1) )
+            self.cards.append( Card(-1, -1) )
+            self.cards.append( Card(-1, -1) )
         else:
             self.total_cards = 52
 
     #Shuffles the deck
     def shuffle(self):
-        self.deck.extend( self.inplay )
+        self.cards.extend( self.inplay )
         self.inplay = []
-        shuffle( self.deck )
+        shuffle( self.cards )
     
     #Cuts the deck by the amount specified
+    #Returns true if the deck was cut successfully and false otherwise
     def cut(self, amount):
-        if not amount or amount == 0 or amount > len(self.deck):
-            return "Invalid amount entered"
+        if not amount or amount < 0 or amount > len(self.cards):
+            return False #returns false if cutting by a negative number or more cards than in the deck
         
         temp = [] 
         for i in range(0,amount):
-            temp.append( self.deck.pop(0) )
-        self.deck.extend(temp)
+            temp.append( self.cards.pop(0) )
+        self.cards.extend(temp)
+        return True
 
     #Returns a data dictionary 
     def deal(self, number_of_cards):
         
-        if(number_of_cards > len(self.deck) ):
-            return "Insufficient cards."
+        if(number_of_cards > len(self.cards) ):
+            return False #Returns false if there are insufficient cards
         
         inplay = []
         for i in range(0, number_of_cards):
-            inplay.append( self.deck.pop(0) )
+            inplay.append( self.cards.pop(0) )
         
         self.inplay.extend(inplay)            
         return inplay      
     
     def cards_left(self):
-        return len(self.deck)
+        return len(self.cards)
