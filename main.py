@@ -134,9 +134,9 @@ def score(hand):
     for card in hand:
         if prev and card.value == (prev + 1):
             counter += 1
-            high = card.value
             if counter == 4: #A straight has been recognized
                 straight = True
+                high = card.value
         elif prev and prev == card.value: #ignores pairs when checking for the straight
             pass
         else:
@@ -144,7 +144,8 @@ def score(hand):
         prev = card.value
     
     #If a straight has been realized and the hand has a lower score than a straight
-    if (straight or counter >= 4) and score < 4:  
+    if (straight or counter >= 4) and score < 4:
+        straight = True  
         score = 4
         kicker = [high] #Records the highest card value in the straight in the event of a tie
 
@@ -152,6 +153,7 @@ def score(hand):
     #------------------------------------------------
     #-------------Checking for Flush-----------------
     #------------------------------------------------
+    flush = False
     total = {}
     
     #Loops through the hand calculating the number of cards of each symbol.
@@ -171,10 +173,59 @@ def score(hand):
     
     #If a flush has been realized and the hand has a lower score than a flush
     if key != -1 and score < 5:
+        flush = True
         score = 5
         kicker = [card.value for card in hand if card.symbol == key]        
-        kicker.reverse()
     
+    
+    #------------------------------------------------
+    #-----Checking for Straight & Royal Flush--------
+    #------------------------------------------------
+    if flush and straight:
+        
+        #Doesn't check for the ace low straight
+        counter = 0
+        high = 0
+        straight_flush = False
+        
+        #Checks to see if the hand contains an ace, and if so starts checking for the straight
+        #using an ace low
+        if (kicker[len(kicker)-1] == 14): 
+            prev = 1
+        else: 
+            prev = None
+            
+        #Loops through the hand checking for the straight by comparing the current card to the
+        #the previous one and tabulates the number of cards found in a row
+        #***It ignores pairs by skipping over cards that are similar to the previous one
+        for card in kicker:
+            if prev and card == (prev + 1):
+                counter += 1
+                if counter >= 4: #A straight has been recognized
+                    straight_flush = True
+                    high = card
+            elif prev and prev == card: #ignores pairs when checking for the straight
+                pass
+            else:
+                counter = 0
+            prev = card
+        
+        #If a straight has been realized and the hand has a lower score than a straight
+        if straight_flush:
+            if high == 14:
+                score = 9
+            else:
+                score = 8
+            kicker = [high]
+            return [score, kicker]
+    
+    elif flush:     #if there is only a flush then determines the kickers
+        kicker.reverse()
+        
+        #This ensures only the top 5 kickers are selected and not more.
+        length = len(kicker) - 5
+        for i in range (0,length):
+            kicker.pop() #Pops the last card of the list which is the lowest
     
     #------------------------------------------------
     #-------------------High Card--------------------
@@ -302,6 +353,7 @@ def determine_score(community_cards, players_hands):
                     print k
             if( len(kicker) <= 1):
                 winner = kicker.keys().pop()
+                break
             
         # if needs to go here in case the players tie     
     else:
