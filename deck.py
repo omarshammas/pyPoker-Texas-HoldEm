@@ -13,7 +13,7 @@ class Card:
             return 0
         return 1
     
-    def display(self):
+    def __str__(self):
         text = ""
         if self.value < 0:
             return "Joker";
@@ -28,14 +28,17 @@ class Card:
         else:
             text = str(self.value)
         
-            
-        if self.symbol == 0:
-            text += "D"
-        elif self.symbol == 1:
+        
+        
+        
+        
+        if self.symbol == 0:    #D-Diamonds
+            text += "D" 
+        elif self.symbol == 1:  #H-Hearts
             text += "H"
-        elif self.symbol == 2:
+        elif self.symbol == 2:  #S-Spade
             text += "S"
-        else:
+        else:   #C-Clubs
             text += "C" 
             
         return text    
@@ -66,7 +69,7 @@ class deck:
     #Cuts the deck by the amount specified
     #Returns true if the deck was cut successfully and false otherwise
     def cut(self, amount):
-        if not amount or amount < 0 or amount > len(self.cards):
+        if not amount or amount < 0 or amount >= len(self.cards):
             return False #returns false if cutting by a negative number or more cards than in the deck
         
         temp = [] 

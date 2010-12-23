@@ -1,19 +1,21 @@
 from holdem import Poker
-import sys
+import sys, random
 
-debug = False
-poker = Poker(5, debug) 
+debug = False    #Set to True to see the debug statements
+number_of_players = 4
 
-#counter = 0
-#for k in range(0, 100):
-#    number_of_ties = 0
-#    for n in range(0,100):
+
+poker = Poker(number_of_players, debug)
+if not poker:
+    sys.exit("*** ERROR ***: Invalid number of players. It must be between 2 and 22.")
 
 print "1. Shuffling"
 poker.shuffle()
+
    
 print "2. Cutting"
-if not poker.cut(13):
+if not poker.cut( random.randint(1,51) ):
+    #Cannot cut 0, or the number of cards in the deck
     sys.exit("*** ERROR ***: Invalid amount entered to cut the deck.")    
 
 print "3. Distributing"
@@ -27,7 +29,7 @@ print "-----------------------"
 for hand in players_hands:
     text = "Player - "
     for card in hand:
-        text += card.display() + ", "
+        text += str(card) + "  "
     print text
 print "-----------------------"
 
@@ -58,17 +60,24 @@ community_cards.extend( card )
 #Displays the Cards
 text = "Community Cards - "
 for card in community_cards:
-    text += card.display() + ", "
+    text += str(card) + "  "
 print text  
 print "-----------------------"
 
 
-#Determines the winner
 print "6. Determining Score"
-results = poker.determine_score(community_cards, players_hands)
-print "7. Determining Score"  
-winner = poker.determine_winner(results)
+try:
+    results = poker.determine_score(community_cards, players_hands)
+except:
+    sys.exit("*** ERROR ***: Problem determining the score.")
 
+print "7. Determining Winner"  
+try:
+    winner = poker.determine_winner(results)
+except:
+    sys.exit("*** ERROR ***: Problem determining the winner.")
+
+#Checks to see if the hand has ended in tie and displays the appropriate message         
 tie = True
 try:
     len(winner)
@@ -76,7 +85,6 @@ except:
     tie = False
     
 if not tie:
-    #Prints out the winner
     counter = 0
     print "-------- Winner has Been Determined --------"
     for hand in players_hands:
@@ -85,7 +93,7 @@ if not tie:
         else:
             text = "Loser  -- " 
         for c in hand:
-            text += c.display() + ", "
+            text += str(c) + "  "
         
         text += " --- " + poker.name_of_hand(results[counter][0])
         counter += 1
@@ -99,25 +107,8 @@ else:
         else:
             text = "Loser  -- " 
         for c in hand:
-            text += c.display() + ", "
+            text += str(c) + "  "
         
         text += " --- " + poker.name_of_hand(results[counter][0])
         counter += 1
         print text
-
-#counter = 0
-#print "---- Determining Scores----"
-#for hand in players_hands:
-#    if counter == winner:
-#        text = "Winner -- "
-#    else:
-#        text = "Loser  -- " 
-#    for c in hand:
-#        text += c.display() + ", "
-#    counter += 1
-#    print text
-#if determine_score(community_cards, players_hands):
-#    number_of_ties += 1 
-#    
-#    counter += number_of_ties
-#print "The Average number of ties is " + str(counter/100)
